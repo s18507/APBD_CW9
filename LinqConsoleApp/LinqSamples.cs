@@ -243,7 +243,9 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad4()
         {
-            
+            var maxSalary = Emps.Max(e => e.Salary);
+            var res = (Emps.Where(emp => emp.Salary == maxSalary)).ToList();
+            Console.WriteLine(string.Join("\t", res));
 
         }
 
@@ -307,9 +309,7 @@ namespace LinqConsoleApp
              var res = (from emp in Emps where emp.Job == "Backend programmer" select emp).Any();
              var res2 = res.ToString();
              Console.WriteLine(string.Join("\n", res2));
-            
-
-
+ 
         }
 
         /// <summary>
@@ -333,13 +333,29 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad10Button_Click()
         {
-
+            var res = ((from emp in Emps
+                       select new
+                       {
+                           emp.Ename,
+                           emp.Job,
+                           emp.HireDate
+                       }).Union(from emp in Emps
+                                where emp.Ename.Contains("Brak wartości") && emp.Job == null && emp.HireDate == null
+                                select new
+                                {
+                                    emp.Ename,
+                                    emp.Job,
+                                    emp.HireDate
+                                })).ToList();
+            Console.WriteLine(string.Join("\n", res));
 
         }
 
         //Znajdź pracownika z najwyższą pensją wykorzystując metodę Aggregate()
         public void Przyklad11()
         {
+            var res = Emps.Aggregate((emp, dept) => emp.Salary > dept.Salary ? emp : dept);
+            Console.WriteLine(res);
 
         }
 
@@ -347,7 +363,12 @@ namespace LinqConsoleApp
         //typu CROSS JOIN
         public void Przyklad12()
         {
-
+            var res = Emps.SelectMany(emp => Depts, (emp, dept) => new
+            {
+                Employee = emp,
+                Department = dept
+            }).ToList();
+            Console.WriteLine(string.Join("\n", res));
         }
     }
 }
